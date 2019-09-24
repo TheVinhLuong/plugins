@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
+
 import 'platform_interface.dart';
 import 'src/webview_android.dart';
 import 'src/webview_cupertino.dart';
@@ -367,7 +368,7 @@ class _WebViewState extends State<WebView> {
   void _onWebViewPlatformCreated(WebViewPlatformController webViewPlatform) {
     final WebViewController controller =
         WebViewController._(widget, webViewPlatform, _platformCallbacksHandler);
-    widget.scrollController.webViewController = controller;
+    widget.scrollController?.webViewController = controller;
     _controller.complete(controller);
     if (widget.onWebViewCreated != null) {
       widget.onWebViewCreated(controller);
@@ -391,8 +392,10 @@ CreationParams _creationParamsfromWidget(WebView widget) {
     javascriptChannelNames: _extractChannelNames(widget.javascriptChannels),
     userAgent: widget.userAgent,
     autoMediaPlaybackPolicy: widget.initialMediaPlaybackPolicy,
-      initialScrollOffsetX: widget.scrollController.initialScrollOffsetX,
-      initialScrollOffsetY: widget.scrollController.initialScrollOffsetY
+    initialScrollOffsetX: widget.scrollController != null ? widget
+        .scrollController._initialScrollOffsetX : 0,
+    initialScrollOffsetY: widget.scrollController != null ? widget
+        .scrollController._initialScrollOffsetY : 0,
   );
 }
 
@@ -490,7 +493,7 @@ class _PlatformCallbacksHandler implements WebViewPlatformCallbacksHandler {
     if (_widget.onPageFinished != null) {
       _widget.onPageFinished(url);
     }
-    _widget.scrollController.scrollToInitialOffset();
+    _widget.scrollController?.scrollToInitialOffset();
   }
 
 
@@ -722,12 +725,12 @@ typedef void WebViewScrollListener(int x, int y, int oldX, int oldY);
 
 class WebViewScrollController {
   WebViewScrollController({
-    int initialScrollOffsetX = 0,
-    int initialScrollOffsetY = 0,
-  })  : assert(initialScrollOffsetX != null),
-        assert(initialScrollOffsetY != null),
-        _initialScrollOffsetY = initialScrollOffsetY,
-        _initialScrollOffsetX = initialScrollOffsetX;
+    int initialOffsetX = 0,
+    int initialOffsetY = 0,
+  })  : assert(initialOffsetX != null),
+        assert(initialOffsetY != null),
+        _initialScrollOffsetY = initialOffsetY,
+        _initialScrollOffsetX = initialOffsetX;
 
   int get initialScrollOffsetX => _initialScrollOffsetX;
   final int _initialScrollOffsetX;

@@ -45,8 +45,8 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
         return null;
       case 'onScrollPositionChanged':
         _platformCallbacksHandler.onScrollPositionChange(
-            call.arguments['scrollX'], call.arguments['scrollY'],
-            call.arguments['oldScrollX'], call.arguments['oldScrollY']);
+            call.arguments['offsetX'], call.arguments['offsetY'],
+            call.arguments['oldOffsetX'], call.arguments['oldOffsetY']);
         return true;
     }
     throw MissingPluginException(
