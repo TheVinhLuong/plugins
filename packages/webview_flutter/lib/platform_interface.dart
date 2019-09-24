@@ -26,8 +26,7 @@ abstract class WebViewPlatformCallbacksHandler {
   /// Invoked by [WebViewPlatformController] when a page has finished loading.
   void onPageFinished(String url);
 
-  void onScrollPositionChange(int scrollX, int scrollY, int oldScrollX,
-      int oldScrollY);
+  void onScrollPositionChange(int scrollX, int scrollY);
 }
 
 /// Interface for talking to the webview's platform implementation.

@@ -850,12 +850,10 @@ void main() {
 
   testWidgets('Attach/Detach scroll listener', (WidgetTester tester) async {
     final WebViewScrollController scrollController = WebViewScrollController();
-    int returnedX, returnedY, returnedOldX, returnedOldY;
-    final Function listener = (int x, int y, int oldX, int oldY) {
+    int returnedX, returnedY;
+    final Function listener = (int x, int y) {
       returnedX = x;
       returnedY = y;
-      returnedOldX = oldX;
-      returnedOldY = oldY;
     };
     scrollController.addListener(listener);
     await tester.pumpWidget(
@@ -870,8 +868,6 @@ void main() {
           platformWebView.fakeScrollOffsetChangedCallback();
           expect(returnedX, 25);
           expect(returnedY, 10);
-          expect(returnedOldX, 0);
-          expect(returnedOldY, 0);
           scrollController.scrollTo(35, 20);
           scrollController.removeListener(listener);
           platformWebView.fakeScrollOffsetChangedCallback();
@@ -1068,9 +1064,7 @@ class FakePlatformWebView {
     final StandardMethodCodec codec = const StandardMethodCodec();
     final Map<String, int> arguments = <String, int>{
       'offsetX': scrollOffsetX,
-      'offsetY': scrollOffsetY,
-      'oldOffsetX': 0,
-      'oldOffsetY': 0
+      'offsetY': scrollOffsetY
     };
     final ByteData data = codec
         .encodeMethodCall(MethodCall('onScrollPositionChanged', arguments));

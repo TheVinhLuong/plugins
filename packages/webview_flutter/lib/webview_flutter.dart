@@ -374,9 +374,9 @@ CreationParams _creationParamsfromWidget(WebView widget) {
     userAgent: widget.userAgent,
     autoMediaPlaybackPolicy: widget.initialMediaPlaybackPolicy,
     initialScrollOffsetX: widget.scrollController != null ? widget
-        .scrollController._initialScrollOffsetX : 0,
+        .scrollController.initialOffsetX : 0,
     initialScrollOffsetY: widget.scrollController != null ? widget
-        .scrollController._initialScrollOffsetY : 0,
+        .scrollController.initialOffsetY : 0,
   );
 }
 
@@ -470,10 +470,9 @@ class _PlatformCallbacksHandler implements WebViewPlatformCallbacksHandler {
 
 
   @override
-  void onScrollPositionChange(int scrollX, int scrollY, int oldScrollX,
-      int oldScrollY) {
+  void onScrollPositionChange(int offsetX, int offsetY) {
     if (_widget.scrollController != null) {
-      _widget.scrollController.notify(scrollX, scrollY, oldScrollX, oldScrollY);
+      _widget.scrollController.notify(offsetX, offsetY);
     }
   }
 
@@ -692,7 +691,7 @@ void _validateUrlString(String url) {
   }
 }
 
-typedef void WebViewScrollListener(int x, int y, int oldX, int oldY);
+typedef void WebViewScrollListener(int x, int y);
 
 class WebViewScrollController {
   WebViewScrollController({
@@ -700,14 +699,14 @@ class WebViewScrollController {
     int initialOffsetY = 0,
   })  : assert(initialOffsetX != null),
         assert(initialOffsetY != null),
-        _initialScrollOffsetY = initialOffsetY,
-        _initialScrollOffsetX = initialOffsetX;
+        _initialOffsetY = initialOffsetY,
+        _initialOffsetX = initialOffsetX;
 
-  int get initialScrollOffsetX => _initialScrollOffsetX;
-  final int _initialScrollOffsetX;
+  int get initialOffsetX => _initialOffsetX;
+  final int _initialOffsetX;
 
-  int get initialScrollOffsetY => _initialScrollOffsetY;
-  final int _initialScrollOffsetY;
+  int get initialOffsetY => _initialOffsetY;
+  final int _initialOffsetY;
 
   final List<WebViewScrollListener> _scrollListeners =
   <WebViewScrollListener>[];
@@ -722,7 +721,7 @@ class WebViewScrollController {
   }
 
   void scrollToInitialOffset() {
-    scrollTo(initialScrollOffsetX, initialScrollOffsetY);
+    scrollTo(initialOffsetX, initialOffsetY);
   }
 
   void addListener(WebViewScrollListener webViewScrollListener) {
@@ -730,9 +729,9 @@ class WebViewScrollController {
     _scrollListeners.add(webViewScrollListener);
   }
 
-  void notify(int x, int y, int oldX, int oldY) {
+  void notify(int x, int y) {
     for (WebViewScrollListener listener in _scrollListeners) {
-      listener(x, y, oldX, oldY);
+      listener(x, y);
     }
   }
 

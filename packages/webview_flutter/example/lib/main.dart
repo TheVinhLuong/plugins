@@ -35,7 +35,7 @@ class WebViewExample extends StatefulWidget {
 class _WebViewExampleState extends State<WebViewExample> {
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
-  final WebViewScrollController _webViewScrollController = WebViewScrollController()..addListener((x, y, oldX, oldY){
+  final WebViewScrollController _webViewScrollController = WebViewScrollController()..addListener((x, y){
     print('Offset: x $x, y: $y');
   });
 
@@ -54,7 +54,7 @@ class _WebViewExampleState extends State<WebViewExample> {
       // to allow calling Scaffold.of(context) so we can show a snackbar.
       body: Builder(builder: (BuildContext context) {
         return WebView(
-            initialUrl: 'https://flutter.dev',
+          initialUrl: 'https://flutter.dev',
           javascriptMode: JavascriptMode.unrestricted,
           onWebViewCreated: (WebViewController webViewController) {
             _controller.complete(webViewController);
