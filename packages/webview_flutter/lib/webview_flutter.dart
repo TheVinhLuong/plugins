@@ -7,7 +7,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-
 import 'platform_interface.dart';
 import 'src/webview_android.dart';
 import 'src/webview_cupertino.dart';
@@ -71,6 +70,9 @@ typedef NavigationDecision NavigationDelegate(NavigationRequest navigation);
 
 /// Signature for when a [WebView] has finished loading a page.
 typedef void PageFinishedCallback(String url);
+
+typedef void OnScrollListener(int scrollX, int scrollY,
+    int oldScrollX, int oldScrollY);
 
 /// Specifies possible restrictions on automatic media playback.
 ///
@@ -139,6 +141,7 @@ class WebView extends StatefulWidget {
     this.navigationDelegate,
     this.gestureRecognizers,
     this.onPageFinished,
+    this.scrollController,
     this.debuggingEnabled = false,
     this.userAgent,
     this.initialMediaPlaybackPolicy =
@@ -300,6 +303,10 @@ class WebView extends StatefulWidget {
   /// The default policy is [AutoMediaPlaybackPolicy.require_user_action_for_all_media_types].
   final AutoMediaPlaybackPolicy initialMediaPlaybackPolicy;
 
+
+  final WebViewScrollController scrollController;
+
+
   @override
   State<StatefulWidget> createState() => _WebViewState();
 }
@@ -341,6 +348,7 @@ class _WebViewState extends State<WebView> {
   void _onWebViewPlatformCreated(WebViewPlatformController webViewPlatform) {
     final WebViewController controller =
         WebViewController._(widget, webViewPlatform, _platformCallbacksHandler);
+    widget.scrollController.webViewController = controller;
     _controller.complete(controller);
     if (widget.onWebViewCreated != null) {
       widget.onWebViewCreated(controller);
@@ -364,6 +372,8 @@ CreationParams _creationParamsfromWidget(WebView widget) {
     javascriptChannelNames: _extractChannelNames(widget.javascriptChannels),
     userAgent: widget.userAgent,
     autoMediaPlaybackPolicy: widget.initialMediaPlaybackPolicy,
+      initialScrollOffsetX: widget.scrollController.initialScrollOffsetX,
+      initialScrollOffsetY: widget.scrollController.initialScrollOffsetY
   );
 }
 
@@ -452,6 +462,16 @@ class _PlatformCallbacksHandler implements WebViewPlatformCallbacksHandler {
     if (_widget.onPageFinished != null) {
       _widget.onPageFinished(url);
     }
+    _widget.scrollController.scrollToInitialOffset();
+  }
+
+
+  @override
+  void onScrollPositionChange(int scrollX, int scrollY, int oldScrollX,
+      int oldScrollY) {
+    if (_widget.scrollController != null) {
+      _widget.scrollController.notify(scrollX, scrollY, oldScrollX, oldScrollY);
+    }
   }
 
   void _updateJavascriptChannelsFromSet(Set<JavascriptChannel> channels) {
@@ -501,6 +521,12 @@ class WebViewController {
     assert(url != null);
     _validateUrlString(url);
     return _webViewPlatformController.loadUrl(url, headers);
+  }
+
+  Future<void> scrollTo(int offsetX,
+      int offsetY) async {
+    assert(offsetX != null && offsetY != null);
+    return _webViewPlatformController.scrollTo(offsetX, offsetY);
   }
 
   /// Accessor to the current URL that the WebView is displaying.
@@ -660,5 +686,55 @@ void _validateUrlString(String url) {
     }
   } on FormatException catch (e) {
     throw ArgumentError(e);
+  }
+}
+
+typedef void WebViewScrollListener(int x, int y, int oldX, int oldY);
+
+class WebViewScrollController {
+  WebViewScrollController({
+    int initialScrollOffsetX = 0,
+    int initialScrollOffsetY = 0,
+  })  : assert(initialScrollOffsetX != null),
+        assert(initialScrollOffsetY != null),
+        _initialScrollOffsetY = initialScrollOffsetY,
+        _initialScrollOffsetX = initialScrollOffsetX;
+
+  int get initialScrollOffsetX => _initialScrollOffsetX;
+  final int _initialScrollOffsetX;
+
+  int get initialScrollOffsetY => _initialScrollOffsetY;
+  final int _initialScrollOffsetY;
+
+  final List<WebViewScrollListener> _scrollListeners =
+  <WebViewScrollListener>[];
+
+  WebViewController _webViewController;
+  set webViewController(WebViewController controller) => _webViewController = controller;
+
+  bool get hasListeners => _scrollListeners.isNotEmpty;
+
+  void scrollTo(int offsetX, int offsetY) {
+    _webViewController.scrollTo(offsetX, offsetY);
+  }
+
+  void scrollToInitialOffset() {
+    scrollTo(initialScrollOffsetX, initialScrollOffsetY);
+  }
+
+  void addListener(WebViewScrollListener webViewScrollListener) {
+    assert(!_scrollListeners.contains(webViewScrollListener));
+    _scrollListeners.add(webViewScrollListener);
+  }
+
+  void notify(int x, int y, int oldX, int oldY) {
+    for (WebViewScrollListener listener in _scrollListeners) {
+      listener(x, y, oldX, oldY);
+    }
+  }
+
+  void removeListener(WebViewScrollListener webViewScrollListener) {
+    assert(_scrollListeners.contains(webViewScrollListener));
+    _scrollListeners.remove(webViewScrollListener);
   }
 }
