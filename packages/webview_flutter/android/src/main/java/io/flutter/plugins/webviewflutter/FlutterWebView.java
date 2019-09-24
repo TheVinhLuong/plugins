@@ -34,6 +34,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
   private final FlutterWebViewClient flutterWebViewClient;
   private final Handler platformThreadHandler;
 
+  @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
   @SuppressWarnings("unchecked")
   FlutterWebView(
       final Context context,
@@ -142,7 +143,6 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
         getTitle(result);
         break;
       case "scrollTo":
-        Log.d("WTF", "SCROLL TO IS CALLED");
         scrollTo(methodCall, result);
         break;
       default:
@@ -311,7 +311,6 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
     webView.setOnScrollChangeListener(new InputAwareWebView.OnScrollChangeListener() {
       @Override
       public void onScrollChange(WebView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-        Log.d("WTF", "ONSCROLLLLLLCHAGNEEE IN ANDROID");
         Map<String, Object> args = new HashMap<>();
         args.put("scrollX", scrollX);
         args.put("scrollY", scrollY);

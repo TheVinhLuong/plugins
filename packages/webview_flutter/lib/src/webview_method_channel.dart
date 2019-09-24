@@ -64,7 +64,6 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
   @override
   Future<void> scrollTo(int offsetX, int offsetY) {
     assert(offsetX != null && offsetY != null);
-    print("COMMECING INVOKE SCROLL TO");
     return _channel.invokeMethod<void>('scrollTo', <String, int>{
       'offsetX': offsetX,
       'offsetY': offsetY,
