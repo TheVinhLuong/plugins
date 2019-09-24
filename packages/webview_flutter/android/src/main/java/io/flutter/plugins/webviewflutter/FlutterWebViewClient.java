@@ -12,10 +12,13 @@ import android.view.KeyEvent;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
 import androidx.webkit.WebViewClientCompat;
-import io.flutter.plugin.common.MethodChannel;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import io.flutter.plugin.common.MethodChannel;
 
 // We need to use WebViewClientCompat to get
 // shouldOverrideUrlLoading(WebView view, WebResourceRequest request)

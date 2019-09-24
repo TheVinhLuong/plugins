@@ -4,13 +4,13 @@
 
 package io.flutter.plugins.webviewflutter;
 
-import static android.content.Context.INPUT_METHOD_SERVICE;
-
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 /**
  * A WebView subclass that mirrors the same implementation hacks that the system WebView does in
@@ -27,6 +27,7 @@ final class InputAwareWebView extends WebView {
   private View threadedInputConnectionProxyView;
   private ThreadedInputConnectionProxyAdapterView proxyAdapterView;
   private View containerView;
+  private OnScrollChangeListener onScrollChangeListener;
 
   InputAwareWebView(Context context, View containerView) {
     super(context);
@@ -44,6 +45,10 @@ final class InputAwareWebView extends WebView {
     if (containerView != null) {
       setInputConnectionTarget(proxyAdapterView);
     }
+  }
+  
+  public void setOnScrollChangeListener(OnScrollChangeListener onScrollChangeListener) {
+    this.onScrollChangeListener = onScrollChangeListener;
   }
 
   /**
@@ -185,5 +190,27 @@ final class InputAwareWebView extends WebView {
             imm.isActive(containerView);
           }
         });
+  }
+
+  @Override
+  protected void onScrollChanged(int l, int t, int oldl, int oldt) {
+    super.onScrollChanged(l, t, oldl, oldt);
+    if (onScrollChangeListener != null) {
+      onScrollChangeListener.onScrollChange(this, l, t, oldl, oldt);
+    }
+  }
+  
+
+  public interface OnScrollChangeListener {
+    /**
+     * Called when the scroll position changes.
+     *
+     * @param v          The view whose scroll position has changed.
+     * @param scrollX    Current horizontal scroll origin.
+     * @param scrollY    Current vertical scroll origin.
+     * @param oldScrollX Previous horizontal scroll origin.
+     * @param oldScrollY Previous vertical scroll origin.
+     */
+    void onScrollChange(WebView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY);
   }
 }

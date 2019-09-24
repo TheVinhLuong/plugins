@@ -28,6 +28,9 @@ abstract class WebViewPlatformCallbacksHandler {
 
   /// Invoked by [WebViewPlatformController] when a page has finished loading.
   void onPageFinished(String url);
+
+  void onScrollPositionChange(int scrollX, int scrollY, int oldScrollX,
+      int oldScrollY);
 }
 
 /// Interface for talking to the webview's platform implementation.
@@ -62,6 +65,12 @@ abstract class WebViewPlatformController {
   ) {
     throw UnimplementedError(
         "WebView loadUrl is not implemented on the current platform");
+  }
+
+  Future<void> scrollTo(int offsetX,
+      int offsetY,) {
+    throw UnimplementedError(
+        "WebView scrollTo is not implemented on the current platform");
   }
 
   /// Updates the webview settings.
@@ -280,6 +289,8 @@ class CreationParams {
     this.webSettings,
     this.javascriptChannelNames,
     this.userAgent,
+    this.initialScrollOffsetX,
+    this.initialScrollOffsetY,
     this.autoMediaPlaybackPolicy =
         AutoMediaPlaybackPolicy.require_user_action_for_all_media_types,
   }) : assert(autoMediaPlaybackPolicy != null);
@@ -315,6 +326,10 @@ class CreationParams {
   /// Which restrictions apply on automatic media playback.
   final AutoMediaPlaybackPolicy autoMediaPlaybackPolicy;
 
+  final int initialScrollOffsetX;
+
+  final int initialScrollOffsetY;
+  
   @override
   String toString() {
     return '$runtimeType(initialUrl: $initialUrl, settings: $webSettings, javascriptChannelNames: $javascriptChannelNames, UserAgent: $userAgent)';
