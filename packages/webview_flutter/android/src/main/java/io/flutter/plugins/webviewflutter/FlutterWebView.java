@@ -310,12 +310,12 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
   private void attachOnScrollListener() {
     webView.setOnScrollChangeListener(new InputAwareWebView.OnScrollChangeListener() {
       @Override
-      public void onScrollChange(WebView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+      public void onScrollChange(WebView v, int offsetX, int offsetY, int oldOffsetX, int oldOffsetY) {
         Map<String, Object> args = new HashMap<>();
-        args.put("scrollX", scrollX);
-        args.put("scrollY", scrollY);
-        args.put("oldScrollX", oldScrollX);
-        args.put("oldScrollY", oldScrollY);
+        args.put("offsetX", offsetX);
+        args.put("offsetY", offsetY);
+        args.put("oldOffsetX", oldOffsetX);
+        args.put("oldOffsetY", oldOffsetY);
         methodChannel.invokeMethod("onScrollPositionChanged", args);
       }
     });

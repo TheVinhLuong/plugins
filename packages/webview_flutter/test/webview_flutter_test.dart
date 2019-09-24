@@ -830,6 +830,74 @@ void main() {
 
     expect(platformWebView.userAgent, 'UA');
   });
+
+  testWidgets('Scroll programmatically', (WidgetTester tester) async {
+    final WebViewScrollController scrollController = WebViewScrollController();
+    await tester.pumpWidget(
+      WebView(
+        initialUrl: 'https://youtube.com',
+        onWebViewCreated: (WebViewController webViewController) {
+          scrollController.scrollTo(25, 10);
+          final FakePlatformWebView platformWebView =
+              fakePlatformViewsController.lastCreatedView;
+          expect(platformWebView.scrollOffsetY, 10);
+          expect(platformWebView.scrollOffsetX, 25);
+        },
+        scrollController: scrollController,
+      ),
+    );
+  });
+
+  testWidgets('Attach/Detach scroll listener', (WidgetTester tester) async {
+    final WebViewScrollController scrollController = WebViewScrollController();
+    int returnedX, returnedY, returnedOldX, returnedOldY;
+    final Function listener = (int x, int y, int oldX, int oldY) {
+      returnedX = x;
+      returnedY = y;
+      returnedOldX = oldX;
+      returnedOldY = oldY;
+    };
+    scrollController.addListener(listener);
+    await tester.pumpWidget(
+      WebView(
+        initialUrl: 'https://youtube.com',
+        onWebViewCreated: (WebViewController webViewController) {
+          scrollController.scrollTo(25, 10);
+          final FakePlatformWebView platformWebView =
+              fakePlatformViewsController.lastCreatedView;
+          expect(platformWebView.scrollOffsetY, 10);
+          expect(platformWebView.scrollOffsetX, 25);
+          platformWebView.fakeScrollOffsetChangedCallback();
+          expect(returnedX, 25);
+          expect(returnedY, 10);
+          expect(returnedOldX, 0);
+          expect(returnedOldY, 0);
+          scrollController.scrollTo(35, 20);
+          scrollController.removeListener(listener);
+          platformWebView.fakeScrollOffsetChangedCallback();
+          expect(returnedX, isNot(35));
+          expect(returnedY, isNot(20));
+        },
+        scrollController: scrollController,
+      ),
+    );
+  });
+
+  testWidgets('Set Initial offset', (WidgetTester tester) async {
+    final WebViewScrollController scrollController = WebViewScrollController(
+        initialOffsetX: 21, initialOffsetY: 22);
+    await tester.pumpWidget(
+      WebView(
+        initialUrl: 'https://youtube.com',
+        scrollController: scrollController,
+      ),
+    );
+    final FakePlatformWebView platformWebView =
+        fakePlatformViewsController.lastCreatedView;
+    platformWebView.fakeOnPageFinishedCallback();
+    expect(platformWebView.scrollOffsetX, 21);
+    expect(platformWebView.scrollOffsetY, 22);
+  });
 }
 
 class FakePlatformWebView {
@@ -870,7 +938,11 @@ class FakePlatformWebView {
   bool debuggingEnabled;
   String userAgent;
 
+  int scrollOffsetY = 0;
+  int scrollOffsetX = 0;
+
   Future<dynamic> onMethodCall(MethodCall call) {
+    print("METHOD: ${call.method}");
     switch (call.method) {
       case 'loadUrl':
         final Map<dynamic, dynamic> request = call.arguments;
@@ -923,6 +995,12 @@ class FakePlatformWebView {
       case 'clearCache':
         hasCache = false;
         return Future<void>.sync(() {});
+        break;
+      case 'scrollTo':
+        scrollOffsetY += call.arguments["offsetY"];
+        scrollOffsetX += call.arguments["offsetX"];
+        return Future<void>.sync(() {});
+        break;
     }
     return Future<void>.sync(() {});
   }
@@ -984,6 +1062,23 @@ class FakePlatformWebView {
       data,
       (ByteData data) {},
     );
+  }
+
+  void fakeScrollOffsetChangedCallback() {
+    final StandardMethodCodec codec = const StandardMethodCodec();
+    final Map<String, int> arguments = <String, int>{
+      'offsetX': scrollOffsetX,
+      'offsetY': scrollOffsetY,
+      'oldOffsetX': 0,
+      'oldOffsetY': 0
+    };
+    final ByteData data = codec
+        .encodeMethodCall(MethodCall('onScrollPositionChanged', arguments));
+    // TODO(hterkelsen): Remove this when defaultBinaryMessages is in stable.
+    // https://github.com/flutter/flutter/issues/33446
+    // ignore: deprecated_member_use
+    BinaryMessages.handlePlatformMessage(
+        channel.name, data, (ByteData data) {});
   }
 
   void _loadUrl(String url) {
