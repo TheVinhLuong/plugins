@@ -4,13 +4,13 @@
 
 package io.flutter.plugins.webviewflutter;
 
+import static android.content.Context.INPUT_METHOD_SERVICE;
+
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
-
-import static android.content.Context.INPUT_METHOD_SERVICE;
 
 /**
  * A WebView subclass that mirrors the same implementation hacks that the system WebView does in
@@ -205,7 +205,7 @@ final class InputAwareWebView extends WebView {
     /**
      * Called when the scroll position changes.
      *
-     * @param v          The view whose scroll position has changed.
+     * @param v          The webview whose scroll position has changed.
      * @param scrollX    Current horizontal scroll origin.
      * @param scrollY    Current vertical scroll origin.
      * @param oldScrollX Previous horizontal scroll origin.
