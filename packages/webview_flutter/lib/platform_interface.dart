@@ -63,8 +63,10 @@ abstract class WebViewPlatformController {
         "WebView loadUrl is not implemented on the current platform");
   }
 
-  Future<void> scrollTo(int offsetX,
-      int offsetY,) {
+  Future<void> scrollTo(
+    int offsetX,
+    int offsetY,
+  ) {
     throw UnimplementedError(
         "WebView scrollTo is not implemented on the current platform");
   }
@@ -308,10 +310,12 @@ class CreationParams {
   /// Which restrictions apply on automatic media playback.
   final AutoMediaPlaybackPolicy autoMediaPlaybackPolicy;
 
+  /// Translation value in the direction of the x-axis when the page is loaded
   final int initialScrollOffsetX;
 
+  /// Translation value in the direction of the y-axis when the page is loaded
   final int initialScrollOffsetY;
-  
+
   @override
   String toString() {
     return '$runtimeType(initialUrl: $initialUrl, settings: $webSettings, javascriptChannelNames: $javascriptChannelNames, UserAgent: $userAgent)';

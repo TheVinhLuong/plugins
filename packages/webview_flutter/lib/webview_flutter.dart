@@ -72,8 +72,8 @@ typedef NavigationDecision NavigationDelegate(NavigationRequest navigation);
 /// Signature for when a [WebView] has finished loading a page.
 typedef void PageFinishedCallback(String url);
 
-typedef void OnScrollListener(int scrollX, int scrollY,
-    int oldScrollX, int oldScrollY);
+typedef void OnScrollListener(
+    int scrollX, int scrollY, int oldScrollX, int oldScrollY);
 
 /// Specifies possible restrictions on automatic media playback.
 ///
@@ -304,9 +304,7 @@ class WebView extends StatefulWidget {
   /// The default policy is [AutoMediaPlaybackPolicy.require_user_action_for_all_media_types].
   final AutoMediaPlaybackPolicy initialMediaPlaybackPolicy;
 
-
   final WebViewScrollController scrollController;
-
 
   @override
   State<StatefulWidget> createState() => _WebViewState();
@@ -349,6 +347,7 @@ class _WebViewState extends State<WebView> {
   void _onWebViewPlatformCreated(WebViewPlatformController webViewPlatform) {
     final WebViewController controller =
         WebViewController._(widget, webViewPlatform, _platformCallbacksHandler);
+    // Need [WebViewController] to make a programmatically scroll
     widget.scrollController?.webViewController = controller;
     _controller.complete(controller);
     if (widget.onWebViewCreated != null) {
@@ -373,10 +372,12 @@ CreationParams _creationParamsfromWidget(WebView widget) {
     javascriptChannelNames: _extractChannelNames(widget.javascriptChannels),
     userAgent: widget.userAgent,
     autoMediaPlaybackPolicy: widget.initialMediaPlaybackPolicy,
-    initialScrollOffsetX: widget.scrollController != null ? widget
-        .scrollController.initialOffsetX : 0,
-    initialScrollOffsetY: widget.scrollController != null ? widget
-        .scrollController.initialOffsetY : 0,
+    initialScrollOffsetX: widget.scrollController != null
+        ? widget.scrollController.initialOffsetX
+        : 0,
+    initialScrollOffsetY: widget.scrollController != null
+        ? widget.scrollController.initialOffsetY
+        : 0,
   );
 }
 
@@ -465,9 +466,9 @@ class _PlatformCallbacksHandler implements WebViewPlatformCallbacksHandler {
     if (_widget.onPageFinished != null) {
       _widget.onPageFinished(url);
     }
+    // The scroll can only be made after the page is finished loading.
     _widget.scrollController?.scrollToInitialOffset();
   }
-
 
   @override
   void onScrollPositionChange(int offsetX, int offsetY) {
@@ -525,8 +526,7 @@ class WebViewController {
     return _webViewPlatformController.loadUrl(url, headers);
   }
 
-  Future<void> scrollTo(int offsetX,
-      int offsetY) async {
+  Future<void> scrollTo(int offsetX, int offsetY) async {
     assert(offsetX != null && offsetY != null);
     return _webViewPlatformController.scrollTo(offsetX, offsetY);
   }
@@ -693,6 +693,7 @@ void _validateUrlString(String url) {
 
 typedef void WebViewScrollListener(int x, int y);
 
+/// A controller that handle all feature regarding scroll
 class WebViewScrollController {
   WebViewScrollController({
     int initialOffsetX = 0,
@@ -709,10 +710,11 @@ class WebViewScrollController {
   final int _initialOffsetY;
 
   final List<WebViewScrollListener> _scrollListeners =
-  <WebViewScrollListener>[];
+      <WebViewScrollListener>[];
 
   WebViewController _webViewController;
-  set webViewController(WebViewController controller) => _webViewController = controller;
+  set webViewController(WebViewController controller) =>
+      _webViewController = controller;
 
   bool get hasListeners => _scrollListeners.isNotEmpty;
 

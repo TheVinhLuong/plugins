@@ -59,7 +59,6 @@ class MethodChannelWebViewPlatform implements WebViewPlatformController {
     });
   }
 
-
   @override
   Future<void> scrollTo(int offsetX, int offsetY) {
     assert(offsetX != null && offsetY != null);

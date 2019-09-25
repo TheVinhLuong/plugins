@@ -880,8 +880,8 @@ void main() {
   });
 
   testWidgets('Set Initial offset', (WidgetTester tester) async {
-    final WebViewScrollController scrollController = WebViewScrollController(
-        initialOffsetX: 21, initialOffsetY: 22);
+    final WebViewScrollController scrollController =
+        WebViewScrollController(initialOffsetX: 21, initialOffsetY: 22);
     await tester.pumpWidget(
       WebView(
         initialUrl: 'https://youtube.com',
@@ -938,7 +938,6 @@ class FakePlatformWebView {
   int scrollOffsetX = 0;
 
   Future<dynamic> onMethodCall(MethodCall call) {
-    print("METHOD: ${call.method}");
     switch (call.method) {
       case 'loadUrl':
         final Map<dynamic, dynamic> request = call.arguments;

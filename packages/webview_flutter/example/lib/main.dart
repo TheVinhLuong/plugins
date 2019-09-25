@@ -9,7 +9,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-
 void main() => runApp(MaterialApp(home: WebViewExample()));
 
 const String kNavigationExamplePage = '''
@@ -35,9 +34,8 @@ class WebViewExample extends StatefulWidget {
 class _WebViewExampleState extends State<WebViewExample> {
   final Completer<WebViewController> _controller =
       Completer<WebViewController>();
-  final WebViewScrollController _webViewScrollController = WebViewScrollController()..addListener((x, y){
-    print('Offset: x $x, y: $y');
-  });
+  final WebViewScrollController _webViewScrollController =
+      WebViewScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -54,29 +52,28 @@ class _WebViewExampleState extends State<WebViewExample> {
       // to allow calling Scaffold.of(context) so we can show a snackbar.
       body: Builder(builder: (BuildContext context) {
         return WebView(
-          initialUrl: 'https://flutter.dev',
-          javascriptMode: JavascriptMode.unrestricted,
-          onWebViewCreated: (WebViewController webViewController) {
-            _controller.complete(webViewController);
-          },
-          // TODO(iskakaushik): Remove this when collection literals makes it to stable.
-          // ignore: prefer_collection_literals
-          javascriptChannels: <JavascriptChannel>[
-            _toasterJavascriptChannel(context),
-          ].toSet(),
-          navigationDelegate: (NavigationRequest request) {
-            if (request.url.startsWith('https://www.youtube.com/')) {
-              print('blocking navigation to $request}');
-              return NavigationDecision.prevent;
-            }
-            print('allowing navigation to $request');
-            return NavigationDecision.navigate;
-          },
-          onPageFinished: (String url) {
-            print('Page finished loading: $url');
-          },
-            scrollController: _webViewScrollController
-        );
+            initialUrl: 'https://flutter.dev',
+            javascriptMode: JavascriptMode.unrestricted,
+            onWebViewCreated: (WebViewController webViewController) {
+              _controller.complete(webViewController);
+            },
+            // TODO(iskakaushik): Remove this when collection literals makes it to stable.
+            // ignore: prefer_collection_literals
+            javascriptChannels: <JavascriptChannel>[
+              _toasterJavascriptChannel(context),
+            ].toSet(),
+            navigationDelegate: (NavigationRequest request) {
+              if (request.url.startsWith('https://www.youtube.com/')) {
+                print('blocking navigation to $request}');
+                return NavigationDecision.prevent;
+              }
+              print('allowing navigation to $request');
+              return NavigationDecision.navigate;
+            },
+            onPageFinished: (String url) {
+              print('Page finished loading: $url');
+            },
+            scrollController: _webViewScrollController);
       }),
       floatingActionButton: favoriteButton(),
     );
@@ -269,9 +266,7 @@ class SampleMenu extends StatelessWidget {
   }
 
   void _scrollToRandomPosition(WebViewScrollController scrollController) {
-    final Random random = Random(DateTime
-        .now()
-        .millisecondsSinceEpoch);
+    final Random random = Random(DateTime.now().millisecondsSinceEpoch);
     scrollController.scrollTo(0, random.nextInt(2000));
   }
 
