@@ -537,14 +537,13 @@ void main() {
   });
 
   test('on scroll listener', () async {
-    final Completer<int> receivedXCompletor =
-    Completer<int>();
-    final Completer<int> receivedYCompletor =
-    Completer<int>();
+    final Completer<int> receivedXCompletor = Completer<int>();
+    final Completer<int> receivedYCompletor = Completer<int>();
     final Completer<void> pageFinishedLoadCompleter =
-    Completer<WebViewController>();
-    final WebViewScrollController webViewScrollController = WebViewScrollController();
-    final Function scrollListener = (int x, int y){
+        Completer<WebViewController>();
+    final WebViewScrollController webViewScrollController =
+        WebViewScrollController();
+    final Function scrollListener = (int x, int y) {
       receivedXCompletor.complete(x);
       receivedYCompletor.complete(y);
     };
@@ -571,18 +570,14 @@ void main() {
     expect(newY, 20);
   });
 
-  test('scroll programmatically', () async {
-    final Completer<int> receivedXCompletor =
-    Completer<int>();
-    final Completer<int> receivedYCompletor =
-    Completer<int>();
+  test('initial scroll programmatically', () async {
+    final Completer<int> receivedXCompletor = Completer<int>();
+    final Completer<int> receivedYCompletor = Completer<int>();
     final Completer<void> pageFinishedLoadCompleter =
-    Completer<WebViewController>();
-    final WebViewScrollController webViewScrollController = WebViewScrollController(
-      initialOffsetX: 25,
-      initialOffsetY: 35
-    );
-    final Function scrollListener = (int x, int y){
+        Completer<WebViewController>();
+    final WebViewScrollController webViewScrollController =
+        WebViewScrollController(initialOffsetX: 25, initialOffsetY: 35);
+    final Function scrollListener = (int x, int y) {
       receivedXCompletor.complete(x);
       receivedYCompletor.complete(y);
     };

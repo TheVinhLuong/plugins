@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## 0.3.19+10
 
 * Replace deprecated `getFlutterEngine` call on Android.
@@ -93,6 +94,9 @@
 ## 0.3.14+2
 
 * Define clang module for iOS.
+## 0.3.15
+
+* Allow user to listen to scrolling event and perform a programmatically scroll.
 
 ## 0.3.14+1
 

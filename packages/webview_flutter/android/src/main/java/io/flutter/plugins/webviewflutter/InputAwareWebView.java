@@ -196,21 +196,11 @@ final class InputAwareWebView extends WebView {
   protected void onScrollChanged(int l, int t, int oldl, int oldt) {
     super.onScrollChanged(l, t, oldl, oldt);
     if (onScrollChangeListener != null) {
-      onScrollChangeListener.onScrollChange(this, l, t, oldl, oldt);
+      onScrollChangeListener.onScrollChange(this, l, t);
     }
   }
-  
 
   public interface OnScrollChangeListener {
-    /**
-     * Called when the scroll position changes.
-     *
-     * @param v          The webview whose scroll position has changed.
-     * @param offsetX    Current horizontal scroll origin.
-     * @param offsetY    Current vertical scroll origin.
-     * @param oldOffsetX Previous horizontal scroll origin.
-     * @param oldOffsetY Previous vertical scroll origin.
-     */
-    void onScrollChange(WebView v, int offsetX, int offsetY, int oldOffsetX, int oldOffsetY);
+    void onScrollChange(WebView v, int offsetX, int offsetY);
   }
 }

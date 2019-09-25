@@ -9,23 +9,20 @@ import android.content.Context;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.platform.PlatformView;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FlutterWebView implements PlatformView, MethodCallHandler {
   private static final String JS_CHANNEL_NAMES_FIELD = "javascriptChannelNames";
@@ -261,8 +258,8 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
   private void getTitle(Result result) {
     result.success(webView.getTitle());
   }
-  
-  @SuppressWarnings({"unchecked","ConstantConditions"})
+
+  @SuppressWarnings({"unchecked", "ConstantConditions"})
   private void scrollTo(MethodCall methodCall, Result result) {
     Map<String, Integer> offsets = (Map<String, Integer>) methodCall.arguments;
     webView.scrollTo(offsets.get("offsetX"), offsets.get("offsetY"));
@@ -331,18 +328,18 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
   }
 
   private void attachOnScrollListener() {
-    webView.setOnScrollChangeListener(new InputAwareWebView.OnScrollChangeListener() {
-      @Override
-      public void onScrollChange(WebView v, int offsetX, int offsetY, int oldOffsetX, int oldOffsetY) {
-        Map<String, Object> args = new HashMap<>();
-        args.put("offsetX", offsetX);
-        args.put("offsetY", offsetY);
-        args.put("oldOffsetX", oldOffsetX);
-        args.put("oldOffsetY", oldOffsetY);
-        methodChannel.invokeMethod("onScrollPositionChanged", args);
-      }
-    });
+    webView.setOnScrollChangeListener(
+        new InputAwareWebView.OnScrollChangeListener() {
+          @Override
+          public void onScrollChange(WebView v, int offsetX, int offsetY) {
+            Map<String, Object> args = new HashMap<>();
+            args.put("offsetX", offsetX);
+            args.put("offsetY", offsetY);
+            methodChannel.invokeMethod("onScrollPositionChanged", args);
+          }
+        });
   }
+
   @Override
   public void dispose() {
     methodChannel.setMethodCallHandler(null);
