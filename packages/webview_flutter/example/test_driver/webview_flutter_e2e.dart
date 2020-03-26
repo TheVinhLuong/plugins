@@ -601,7 +601,6 @@ void main() {
     expect(newX, 25);
     expect(newY, 35);
   });
-}
 
   group('NavigationDelegate', () {
     final String blankPage = "<!DOCTYPE html><head></head><body></body></html>";
